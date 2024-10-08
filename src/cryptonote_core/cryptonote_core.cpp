@@ -1199,6 +1199,7 @@ void core::start_oxenmq() {
         m_omq->add_timer([this]() { this->check_service_node_time(); }, 5s, false);
     }
     m_omq->start();
+    check_system_clock();
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -2598,6 +2599,27 @@ eth::bls_registration_response core::bls_registration(const eth::address& addres
 bool core::add_service_node_vote(
         const service_nodes::quorum_vote_t& vote, vote_verification_context& vvc) {
     return m_quorum_cop.handle_vote(vote, vvc);
+}
+//-----------------------------------------------------------------------------------------------
+void core::check_system_clock() {
+    auto now = std::chrono::steady_clock::now();
+    auto network_time = std::chrono::steady_clock::now();  // Placeholder for network time
+    auto threshold = std::chrono::nanoseconds(500);
+
+    // Check if the system clock is ahead of network time by more than the threshold
+    if (now - network_time > threshold) {
+        log::warning(
+                globallogcat,
+                "Warning: System clock is ahead of network time by more than the allowed "
+                "threshold!");
+    }
+    // Check if the system clock is behind network time by more than the threshold
+    else if (network_time - now > threshold) {
+        log::warning(
+                globallogcat,
+                "Warning: System clock is behind of network time by more than the allowed "
+                "threshold!");
+    }
 }
 //-----------------------------------------------------------------------------------------------
 std::time_t core::get_start_time() const {

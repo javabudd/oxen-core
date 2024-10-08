@@ -613,6 +613,11 @@ class core final {
     bool add_service_node_vote(
             const service_nodes::quorum_vote_t& vote, vote_verification_context& vvc);
 
+    /**
+     * @brief compare the system time to the service node network time
+     */
+    void check_system_clock();
+
     using service_keys = service_nodes::service_node_keys;
 
     /**
